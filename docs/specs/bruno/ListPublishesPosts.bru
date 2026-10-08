@@ -1,0 +1,28 @@
+meta {
+  name: List Published Posts
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/posts?page=1&pageSize=10
+  body: none
+  auth: none
+}
+
+params:query {
+  page: 1
+  pageSize: 10
+  ~category: architecture
+}
+
+tests {
+  test("Status code should be 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Should return items list", function() {
+    const data = res.getBody();
+    expect(data.items).to.be.an('array');
+  });
+}
