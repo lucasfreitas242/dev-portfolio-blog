@@ -1,0 +1,81 @@
+openapi: 3.0.3
+info:
+  title: Dev Portfolio & Blog API
+  version: 1.0.0
+  description: Canonical specification for the portfolio blog engine and headless CMS.
+paths:
+  /api/v1/posts:
+    get:
+      summary: List published posts
+      operationId: ListPublishedPosts
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paginated post items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedPostSummary'
+
+components:
+  schemas:
+    PostSummary:
+      type: object
+      required: [id, title, slug, summary, readingTimeMinutes, categoryName, categorySlug]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        slug:
+          type: string
+        summary:
+          type: string
+        coverImage:
+          type: string
+          nullable: true
+        readingTimeMinutes:
+          type: integer
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        categoryName:
+          type: string
+        categorySlug:
+          type: string
+
+    PagedPostSummary:
+      type: object
+      required: [items, page, pageSize, totalItems, totalPages]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostSummary'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        totalItems:
+          type: integer
+        totalPages:
+          type: integer
