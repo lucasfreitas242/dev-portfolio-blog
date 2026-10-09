@@ -97,4 +97,77 @@ public class PostRepository(AppDbContext db) : IPostRepository
         db.Posts.Update(post);
         await db.SaveChangesAsync(ct);
     }
+
+    public async Task<bool> ExistsBySlugAsync(string slug, CancellationToken ct = default)
+    {
+        return await db.Posts.AnyAsync(p => p.Slug == slug.Trim().ToLowerInvariant(), ct);
+    }
+
+    public async Task<bool> ExistsByTranslationGroupAndLanguageAsync(
+        Guid translationGroupId, 
+        string language, 
+        CancellationToken ct = default)
+    {
+        return await db.Posts.AnyAsync(
+            p => p.TranslationGroupId == translationGroupId && p.Language == language.Trim(), 
+            ct);
+    }
+
+    public async Task<bool> TranslationGroupExistsAsync(Guid translationGroupId, CancellationToken ct = default)
+    {
+        return await db.Posts.AnyAsync(p => p.TranslationGroupId == translationGroupId, ct);
+    }
+
+    public async Task<bool> CategoryExistsAsync(Guid categoryId, CancellationToken ct = default)
+    {
+        return await db.Categories.AnyAsync(c => c.Id == categoryId, ct);
+    }
+
+    public async Task<Guid> GetDefaultAuthorIdAsync(CancellationToken ct = default)
+    {
+        var author = await db.Users.OrderBy(u => u.CreatedAt).FirstOrDefaultAsync(ct);
+        return author?.Id ?? Guid.Empty;
+    }
+
+    public async Task<List<Tag>> GetOrCreateTagsAsync(
+        IEnumerable<string> tagNames, 
+        CancellationToken ct = default)
+    {
+        var tagsToProcess = tagNames
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Select(name => name.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (tagsToProcess.Count == 0)
+        {
+            return [];
+        }
+
+        var normalizedTags = tagsToProcess
+            .Select(name => new { Name = name, Slug = Blog.Domain.Common.SlugHelper.Generate(name) })
+            .Where(x => !string.IsNullOrWhiteSpace(x.Slug))
+            .GroupBy(x => x.Slug)
+            .Select(g => g.First())
+            .ToList();
+
+        var slugs = normalizedTags.Select(x => x.Slug).ToList();
+
+        var existingTags = await db.Tags
+            .Where(t => slugs.Contains(t.Slug))
+            .ToListAsync(ct);
+
+        var existingSlugs = existingTags.Select(t => t.Slug).ToHashSet();
+        var newTags = normalizedTags
+            .Where(x => !existingSlugs.Contains(x.Slug))
+            .Select(x => new Tag(x.Name, x.Slug))
+            .ToList();
+
+        if (newTags.Count > 0)
+        {
+            await db.Tags.AddRangeAsync(newTags, ct);
+        }
+
+        return existingTags.Concat(newTags).ToList();
+    }
 }

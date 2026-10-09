@@ -65,6 +65,72 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
 
+  /api/v1/posts:
+    post:
+      summary: Create a new post or translation
+      operationId: CreatePost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostRequest'
+      responses:
+        '201':
+          description: Post successfully created
+          headers:
+            Location:
+              schema:
+                type: string
+              description: Relative URL to the created post resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostCreated'
+        '400':
+          description: Validation error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Referenced Category or TranslationGroup not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Slug or TranslationGroup language conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /api/v1/posts/{id}/publish:
+    post:
+      summary: Publish an existing draft post
+      operationId: PublishPost
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Post published successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostPublished'
+        '404':
+          description: Post not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
 components:
   schemas:
     ProblemDetails:
@@ -185,3 +251,84 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PostTranslation'
+
+    CreatePostRequest:
+      type: object
+      required: [title, summary, contentMd, categoryId]
+      properties:
+        title:
+          type: string
+        slug:
+          type: string
+          nullable: true
+        language:
+          type: string
+          example: "en-US"
+          nullable: true
+        translationGroupId:
+          type: string
+          format: uuid
+          nullable: true
+        summary:
+          type: string
+        contentMd:
+          type: string
+        coverImage:
+          type: string
+          nullable: true
+        categoryId:
+          type: string
+          format: uuid
+        tags:
+          type: array
+          items:
+            type: string
+          nullable: true
+        publishNow:
+          type: boolean
+          default: false
+        authorId:
+          type: string
+          format: uuid
+          nullable: true
+
+    PostCreated:
+      type: object
+      required: [id, slug, language, translationGroupId, status, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        language:
+          type: string
+        translationGroupId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          example: "Draft"
+        createdAt:
+          type: string
+          format: date-time
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    PostPublished:
+      type: object
+      required: [id, slug, status, publishedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        status:
+          type: string
+          example: "Published"
+        publishedAt:
+          type: string
+          format: date-time

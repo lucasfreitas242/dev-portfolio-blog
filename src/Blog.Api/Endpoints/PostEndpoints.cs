@@ -1,7 +1,9 @@
 namespace Blog.Api.Endpoints;
 
+using Blog.Application.Posts.CreatePost;
 using Blog.Application.Posts.GetPostBySlug;
 using Blog.Application.Posts.ListPublishedPosts;
+using Blog.Application.Posts.PublishPost;
 
 public static class PostEndpoints
 {
@@ -17,6 +19,18 @@ public static class PostEndpoints
         group.MapGet("/{slug}", GetPostBySlug)
              .WithName("GetPostBySlug")
              .Produces<PostDetailDto>(StatusCodes.Status200OK)
+             .ProducesProblem(StatusCodes.Status404NotFound);
+
+        group.MapPost("/", CreatePost)
+             .WithName("CreatePost")
+             .Produces<PostCreatedDto>(StatusCodes.Status201Created)
+             .ProducesProblem(StatusCodes.Status400BadRequest)
+             .ProducesProblem(StatusCodes.Status404NotFound)
+             .ProducesProblem(StatusCodes.Status409Conflict);
+
+        group.MapPost("/{id:guid}/publish", PublishPost)
+             .WithName("PublishPost")
+             .Produces<PostPublishedDto>(StatusCodes.Status200OK)
              .ProducesProblem(StatusCodes.Status404NotFound);
 
         return group;
@@ -38,5 +52,23 @@ public static class PostEndpoints
     {
         var post = await handler.HandleAsync(new GetPostBySlugQuery(slug), ct);
         return Results.Ok(post);
+    }
+
+    private static async Task<IResult> CreatePost(
+        CreatePostCommand command,
+        CreatePostHandler handler,
+        CancellationToken ct)
+    {
+        var result = await handler.HandleAsync(command, ct);
+        return Results.Created($"/api/v1/posts/{result.Slug}", result);
+    }
+
+    private static async Task<IResult> PublishPost(
+        Guid id,
+        PublishPostHandler handler,
+        CancellationToken ct)
+    {
+        var result = await handler.HandleAsync(new PublishPostCommand(id), ct);
+        return Results.Ok(result);
     }
 }

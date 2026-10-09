@@ -9,6 +9,16 @@ public static class DbInitializer
     {
         await context.Database.MigrateAsync();
 
+        await context.Database.ExecuteSqlRawAsync(@"
+            UPDATE posts 
+            SET ""Language"" = 'en-US' 
+            WHERE ""Language"" = '';
+
+            UPDATE posts 
+            SET ""TranslationGroupId"" = ""Id"" 
+            WHERE ""TranslationGroupId"" = '00000000-0000-0000-0000-000000000000';
+        ");
+
         if (await context.Posts.AnyAsync())
         {
             return;

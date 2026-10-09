@@ -8,3 +8,4 @@
 | [ADR-0004](0004-multilingual-posts-and-slug-strategy.md) | Multilingual Posts and Slug Strategy (i18n) | Accepted | 2026-10-09 |
 | [ADR-0005](0005-error-handling-and-problem-details.md) | Error Handling and ProblemDetails Strategy | Accepted | 2026-10-09 |
 | [ADR-0006](0006-adopt-bruno-for-api-testing-and-documentation.md) | Adopt Bruno for API Testing and Documentation | Accepted | 2026-10-09 |
+| [ADR-0007](0007-post-creation-and-translation-authoring-flow.md) | Post Creation and Translation Authoring Flow | Accepted | 2026-10-09 |

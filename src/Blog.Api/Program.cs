@@ -35,6 +35,10 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await DbInitializer.SeedAsync(dbContext);
 }
 
 app.MapPostEndpoints();

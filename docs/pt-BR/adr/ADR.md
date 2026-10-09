@@ -8,3 +8,4 @@
 | [ADR-0004](0004-posts-multilingues-e-estrategia-slug.md) | Posts Multilíngues e Estratégia de Slugs (i18n) | Aceite | 2026-10-09 |
 | [ADR-0005](0005-tratamento-de-erros-e-problem-details.md) | Tratamento de Erros e Estratégia de ProblemDetails | Aceite | 2026-10-09 |
 | [ADR-0006](0006-adotar-bruno-para-testes-e-documentacao-de-api.md) | Adotar Bruno para Testes e Documentação de API | Aceite | 2026-10-09 |
+| [ADR-0007](0007-fluxo-de-criacao-de-posts-e-autoria-de-traducoes.md) | Fluxo de Criação de Posts e Autoria de Traduções | Aceite | 2026-10-09 |

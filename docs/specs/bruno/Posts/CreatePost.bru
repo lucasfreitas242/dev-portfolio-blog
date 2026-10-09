@@ -1,0 +1,43 @@
+meta {
+  name: Create Post
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/v1/posts
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Architecting Scalable .NET APIs",
+    "summary": "Exploring horizontal scaling, caching and vertical slice architecture.",
+    "contentMd": "# Architecting Scalable APIs\n\nDesigning APIs for performance and scale...",
+    "categoryId": "00000000-0000-0000-0000-000000000001",
+    "language": "en-US",
+    "tags": ["Architecture", ".NET", "Scalability"],
+    "publishNow": false
+  }
+}
+
+tests {
+  test("Status code should be 201 Created or 404/409 depending on DB state", function() {
+    expect([201, 404, 409]).to.include(res.getStatus());
+  });
+
+  if (res.getStatus() === 201) {
+    test("Returns created post with valid slug and status", function() {
+      const data = res.getBody();
+      expect(data.id).to.be.a('string');
+      expect(data.slug).to.equal("architecting-scalable-net-apis");
+      expect(data.status).to.equal("Draft");
+      expect(data.translationGroupId).to.be.a('string');
+    });
+  }
+}

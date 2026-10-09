@@ -1,0 +1,17 @@
+meta {
+  name: Publish Post
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/v1/posts/00000000-0000-0000-0000-000000000000/publish
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status code should be 200 or 404", function() {
+    expect([200, 404]).to.include(res.getStatus());
+  });
+}
