@@ -50,6 +50,7 @@ public class PostRepository(AppDbContext db) : IPostRepository
     {
         return await db.Posts
             .AsNoTracking()
+            .Include(p => p.Author)
             .Include(p => p.Category)
             .Include(p => p.Tags)
             .FirstOrDefaultAsync(p => p.Slug == slug.Trim().ToLowerInvariant() && p.Status == PostStatus.Published, ct);

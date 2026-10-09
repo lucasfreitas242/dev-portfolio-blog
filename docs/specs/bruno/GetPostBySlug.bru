@@ -1,0 +1,23 @@
+meta {
+  name: Get Post By Slug
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/posts/building-clean-architecture-dotnet-8
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status code should be 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Slug matches requested post", function() {
+    const data = res.getBody();
+    expect(data.slug).to.equal("building-clean-architecture-dotnet-8");
+    expect(data.contentMd).to.be.a('string');
+  });
+}

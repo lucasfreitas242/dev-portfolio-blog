@@ -1,5 +1,6 @@
 using Blog.Api.Data;
 using Blog.Api.Data.Repositories;
+using Blog.Application.Posts.GetPostBySlug;
 using Blog.Application.Posts.ListPublishedPosts;
 using Blog.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Injeção de Dependências
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<ListPublishedPostsHandler>();
+builder.Services.AddScoped<GetPostBySlugHandler>();
 
 // Swagger / OpenAPI para documentação interativa
 builder.Services.AddEndpointsApiExplorer();
@@ -54,6 +56,21 @@ if (app.Environment.IsDevelopment())
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await DbInitializer.SeedAsync(dbContext);
 }
+
+app.MapGet("/api/v1/posts/{slug}", async (
+    string slug,
+    GetPostBySlugHandler handler,
+    CancellationToken ct) =>
+{
+    var post = await handler.HandleAsync(new GetPostBySlugQuery(slug), ct);
+    return post is not null 
+        ? Results.Ok(post) 
+        : Results.NotFound();
+})
+.WithName("GetPostBySlug")
+.WithTags("Posts")
+.Produces<PostDetailDto>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status404NotFound);
 
 app.UseHttpsRedirection();
 
