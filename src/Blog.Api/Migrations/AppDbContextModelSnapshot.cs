@@ -67,6 +67,11 @@ namespace Blog.Api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
                     b.Property<DateTime?>("PublishedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -93,6 +98,9 @@ namespace Blog.Api.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<Guid>("TranslationGroupId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -105,7 +113,11 @@ namespace Blog.Api.Migrations
                     b.HasIndex("Slug")
                         .IsUnique();
 
+                    b.HasIndex("TranslationGroupId");
+
                     b.HasIndex("Status", "PublishedAt");
+
+                    b.HasIndex("Status", "Language", "PublishedAt");
 
                     b.ToTable("posts", (string)null);
                 });

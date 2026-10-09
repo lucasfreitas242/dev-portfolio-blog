@@ -23,6 +23,15 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
         builder.HasIndex(p => p.Slug)
             .IsUnique();
 
+        builder.Property(p => p.Language)
+            .HasMaxLength(10)
+            .IsRequired();
+
+        builder.Property(p => p.TranslationGroupId)
+            .IsRequired();
+
+        builder.HasIndex(p => p.TranslationGroupId);
+
         builder.Property(p => p.Summary)
             .HasMaxLength(300)
             .IsRequired();
@@ -40,6 +49,7 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
             .IsRequired();
 
         builder.HasIndex(p => new { p.Status, p.PublishedAt });
+        builder.HasIndex(p => new { p.Status, p.Language, p.PublishedAt });
 
         builder.HasOne(p => p.Author)
             .WithMany(u => u.Posts)

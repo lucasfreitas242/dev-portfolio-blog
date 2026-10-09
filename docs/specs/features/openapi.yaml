@@ -26,6 +26,12 @@ paths:
           required: false
           schema:
             type: string
+        - name: language
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "pt-BR"
       responses:
         '200':
           description: Paginated post items
@@ -34,11 +40,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/PagedPostSummary'
 
+  /api/v1/posts/{slug}:
+    get:
+      summary: Get post details by localized slug
+      operationId: GetPostBySlug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "building-clean-architecture-dotnet-8"
+      responses:
+        '200':
+          description: Detailed post information including translation references
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostDetail'
+        '404':
+          description: Post not found
+
 components:
   schemas:
     PostSummary:
       type: object
-      required: [id, title, slug, summary, readingTimeMinutes, categoryName, categorySlug]
+      required: [id, title, slug, language, summary, readingTimeMinutes, categoryName, categorySlug]
       properties:
         id:
           type: string
@@ -47,6 +74,9 @@ components:
           type: string
         slug:
           type: string
+        language:
+          type: string
+          example: "en-US"
         summary:
           type: string
         coverImage:
@@ -79,3 +109,59 @@ components:
           type: integer
         totalPages:
           type: integer
+
+    PostTranslation:
+      type: object
+      required: [language, slug]
+      properties:
+        language:
+          type: string
+          example: "pt-BR"
+        slug:
+          type: string
+          example: "construindo-clean-architecture-dotnet-8"
+
+    PostDetail:
+      type: object
+      required: [id, title, slug, language, translationGroupId, summary, contentMd, readingTimeMinutes, authorName, categoryName, categorySlug, tags, availableTranslations]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        slug:
+          type: string
+        language:
+          type: string
+          example: "en-US"
+        translationGroupId:
+          type: string
+          format: uuid
+        summary:
+          type: string
+        contentMd:
+          type: string
+        coverImage:
+          type: string
+          nullable: true
+        readingTimeMinutes:
+          type: integer
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        authorName:
+          type: string
+        categoryName:
+          type: string
+        categorySlug:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        availableTranslations:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostTranslation'

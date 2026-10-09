@@ -8,14 +8,20 @@ public interface IPostRepository
         int page, 
         int pageSize, 
         string? categorySlug = null, 
+        string? language = null,
         CancellationToken ct = default);
 
     Task<int> CountPublishedPostsAsync(
         string? categorySlug = null, 
+        string? language = null,
         CancellationToken ct = default);
 
     Task<Post?> GetBySlugAsync(
         string slug, 
+        CancellationToken ct = default);
+
+    Task<IReadOnlyList<Post>> GetTranslationsByGroupIdAsync(
+        Guid translationGroupId,
         CancellationToken ct = default);
 
     Task<Post?> GetByIdAsync(

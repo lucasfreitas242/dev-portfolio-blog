@@ -9,6 +9,8 @@ public class Post
     public string Slug { get; private set; } = string.Empty;
     public string Summary { get; private set; } = string.Empty;
     public string ContentMd { get; private set; } = string.Empty;
+    public string Language { get; private set; } = "en-US";
+    public Guid TranslationGroupId { get; private set; } = Guid.NewGuid();
     public string? CoverImage { get; private set; }
     public PostStatus Status { get; private set; } = PostStatus.Draft;
     public int ReadingTimeMinutes { get; private set; } = 1;
@@ -26,7 +28,16 @@ public class Post
 
     protected Post() { }
 
-    public static Post Create(string title, string slug, string summary, string contentMd, Guid categoryId, Guid authorId, string? coverImage = null)
+    public static Post Create(
+        string title, 
+        string slug, 
+        string summary, 
+        string contentMd, 
+        Guid categoryId, 
+        Guid authorId, 
+        string language = "en-US",
+        Guid? translationGroupId = null,
+        string? coverImage = null)
     {
         return new Post
         {
@@ -36,6 +47,8 @@ public class Post
             ContentMd = contentMd,
             CategoryId = categoryId,
             AuthorId = authorId,
+            Language = language,
+            TranslationGroupId = translationGroupId ?? Guid.NewGuid(),
             CoverImage = coverImage,
             ReadingTimeMinutes = CalculateReadingTime(contentMd)
         };

@@ -11,6 +11,7 @@ public class PostRepository(AppDbContext db) : IPostRepository
         int page,
         int pageSize,
         string? categorySlug = null,
+        string? language = null,
         CancellationToken ct = default)
     {
         var query = db.Posts
@@ -23,6 +24,11 @@ public class PostRepository(AppDbContext db) : IPostRepository
             query = query.Where(p => p.Category.Slug == categorySlug.Trim().ToLowerInvariant());
         }
 
+        if (!string.IsNullOrWhiteSpace(language))
+        {
+            query = query.Where(p => p.Language == language.Trim());
+        }
+
         return await query
             .OrderByDescending(p => p.PublishedAt)
             .Skip((page - 1) * pageSize)
@@ -32,6 +38,7 @@ public class PostRepository(AppDbContext db) : IPostRepository
 
     public async Task<int> CountPublishedPostsAsync(
         string? categorySlug = null,
+        string? language = null,
         CancellationToken ct = default)
     {
         var query = db.Posts
@@ -41,6 +48,11 @@ public class PostRepository(AppDbContext db) : IPostRepository
         if (!string.IsNullOrWhiteSpace(categorySlug))
         {
             query = query.Where(p => p.Category.Slug == categorySlug.Trim().ToLowerInvariant());
+        }
+
+        if (!string.IsNullOrWhiteSpace(language))
+        {
+            query = query.Where(p => p.Language == language.Trim());
         }
 
         return await query.CountAsync(ct);
@@ -54,6 +66,16 @@ public class PostRepository(AppDbContext db) : IPostRepository
             .Include(p => p.Category)
             .Include(p => p.Tags)
             .FirstOrDefaultAsync(p => p.Slug == slug.Trim().ToLowerInvariant() && p.Status == PostStatus.Published, ct);
+    }
+
+    public async Task<IReadOnlyList<Post>> GetTranslationsByGroupIdAsync(
+        Guid translationGroupId, 
+        CancellationToken ct = default)
+    {
+        return await db.Posts
+            .AsNoTracking()
+            .Where(p => p.TranslationGroupId == translationGroupId && p.Status == PostStatus.Published)
+            .ToListAsync(ct);
     }
 
     public async Task<Post?> GetByIdAsync(Guid id, CancellationToken ct = default)

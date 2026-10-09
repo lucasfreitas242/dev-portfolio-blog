@@ -18,6 +18,11 @@ tests {
   test("Slug matches requested post", function() {
     const data = res.getBody();
     expect(data.slug).to.equal("building-clean-architecture-dotnet-8");
+    expect(data.language).to.equal("en-US");
+    expect(data.availableTranslations).to.be.an('array');
+    expect(data.availableTranslations.length).to.be.greaterThan(0);
+    expect(data.availableTranslations[0].language).to.equal("pt-BR");
+    expect(data.availableTranslations[0].slug).to.equal("construindo-clean-architecture-dotnet-8");
     expect(data.contentMd).to.be.a('string');
   });
 }

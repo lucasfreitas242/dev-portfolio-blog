@@ -13,13 +13,14 @@ public class ListPublishedPostsHandler(IPostRepository postRepository)
     var page = Math.Max(1, query.Page);
     var pageSize = Math.Clamp(query.PageSize, 1, MaxPageSize);
 
-    var posts = await postRepository.GetPublishedPostsAsync(page, pageSize, query.Category, ct);
-    var totalItems = await postRepository.CountPublishedPostsAsync(query.Category, ct);
+    var posts = await postRepository.GetPublishedPostsAsync(page, pageSize, query.Category, query.Language, ct);
+    var totalItems = await postRepository.CountPublishedPostsAsync(query.Category, query.Language, ct);
 
     var items = posts.Select(p => new PostSummaryDto(
         p.Id,
         p.Title,
         p.Slug,
+        p.Language,
         p.Summary,
         p.CoverImage,
         p.ReadingTimeMinutes,

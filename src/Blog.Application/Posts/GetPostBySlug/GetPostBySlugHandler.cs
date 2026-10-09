@@ -20,10 +20,18 @@ public class GetPostBySlugHandler(IPostRepository postRepository)
             return null;
         }
 
+        var translations = await postRepository.GetTranslationsByGroupIdAsync(post.TranslationGroupId, ct);
+        var availableTranslations = translations
+            .Where(t => t.Id != post.Id)
+            .Select(t => new PostTranslationDto(t.Language, t.Slug))
+            .ToList();
+
         return new PostDetailDto(
             Id: post.Id,
             Title: post.Title,
             Slug: post.Slug,
+            Language: post.Language,
+            TranslationGroupId: post.TranslationGroupId,
             Summary: post.Summary,
             ContentMd: post.ContentMd,
             CoverImage: post.CoverImage,
@@ -32,7 +40,8 @@ public class GetPostBySlugHandler(IPostRepository postRepository)
             AuthorName: post.Author.Name,
             CategoryName: post.Category.Name,
             CategorySlug: post.Category.Slug,
-            Tags: post.Tags.Select(t => t.Name).ToList()
+            Tags: post.Tags.Select(t => t.Name).ToList(),
+            AvailableTranslations: availableTranslations
         );
     }
 }
