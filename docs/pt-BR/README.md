@@ -7,4 +7,4 @@ Esta pasta centraliza os registos de decisão arquitetural (ADRs) e diretrizes t
 - **Persistência:** PostgreSQL via Docker e Entity Framework Core.
 - **Abordagem:** Spec-Driven Development (SDD) com contratos OpenAPI e BDD.
 
-Consulte o [Índice de ADRs](adr/README.md) para detalhes sobre as decisões tomadas.
+Consulte o [Índice de ADRs](adr/ADR.md) para detalhes sobre as decisões tomadas.

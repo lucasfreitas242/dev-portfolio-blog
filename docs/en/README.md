@@ -7,4 +7,4 @@ This directory contains the Architecture Decision Records (ADRs) and technical g
 - **Persistence:** PostgreSQL via Docker and Entity Framework Core.
 - **Methodology:** Spec-Driven Development (SDD) backed by OpenAPI and BDD specs.
 
-Check out the [ADR Index](adr/README.md) for detailed rationale on design decisions.
+Check out the [ADR Index](adr/ADR.md) for detailed rationale on design decisions.
