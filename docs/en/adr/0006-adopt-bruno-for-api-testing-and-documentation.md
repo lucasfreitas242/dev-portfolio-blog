@@ -17,8 +17,9 @@ We need an API testing and documentation tool that:
 ## Decision
 We adopt **Bruno** as the official HTTP client and API contract testing tool, located at `docs/specs/bruno/`:
 
-1. **Repository-First Storage**:
-   - Every request is stored as a `.bru` file under `docs/specs/bruno/`.
+1. **Repository-First Storage & Context Grouping**:
+   - Requests are organized into context-based folders matching the API resource/controller (e.g., `docs/specs/bruno/Posts/`, `docs/specs/bruno/Categories/`, `docs/specs/bruno/Auth/`), containing a `folder.bru` descriptor.
+   - Every individual endpoint request is stored as a `.bru` file inside its respective context folder.
    - Environment configurations reside in `docs/specs/bruno/environments/` (e.g., `local.bru`). Sensitive secrets are excluded from version control.
 
 2. **Definition of Done (DoD)**:

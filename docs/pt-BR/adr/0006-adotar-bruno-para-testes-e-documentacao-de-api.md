@@ -17,8 +17,9 @@ Precisamos de uma ferramenta de documentação e teste de APIs que:
 ## Decisão
 Adotamos o **Bruno** como o cliente HTTP oficial e ferramenta de testes de contrato da API, localizado em `docs/specs/bruno/`:
 
-1. **Armazenamento no Repositório (Repository-First)**:
-   - Cada requisição é armazenada como um ficheiro `.bru` em `docs/specs/bruno/`.
+1. **Armazenamento no Repositório e Agrupamento por Contexto**:
+   - As requisições são organizadas em pastas por contexto alinhadas aos recursos/controllers da API (ex.: `docs/specs/bruno/Posts/`, `docs/specs/bruno/Categories/`, `docs/specs/bruno/Auth/`), contendo um descritor `folder.bru`.
+   - Cada requisição de endpoint é armazenada como um ficheiro `.bru` dentro da pasta de seu respectivo contexto.
    - Configurações de ambiente ficam em `docs/specs/bruno/environments/` (ex.: `local.bru`). Segredos sensíveis são excluídos do controle de versão.
 
 2. **Definição de Pronto (Definition of Done - DoD)**:
