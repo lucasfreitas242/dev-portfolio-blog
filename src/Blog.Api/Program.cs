@@ -1,8 +1,7 @@
 using Blog.Api.Data;
 using Blog.Api.Data.Repositories;
 using Blog.Api.Endpoints;
-using Blog.Application.Posts.GetPostBySlug;
-using Blog.Application.Posts.ListPublishedPosts;
+using Blog.Application;
 using Blog.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,8 +16,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Injeção de Dependências
 builder.Services.AddScoped<IPostRepository, PostRepository>();
-builder.Services.AddScoped<ListPublishedPostsHandler>();
-builder.Services.AddScoped<GetPostBySlugHandler>();
+builder.Services.AddApplicationServices();
 
 // Swagger / OpenAPI para documentação interativa
 builder.Services.AddEndpointsApiExplorer();
