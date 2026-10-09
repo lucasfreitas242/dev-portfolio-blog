@@ -60,9 +60,29 @@ paths:
                 $ref: '#/components/schemas/PostDetail'
         '404':
           description: Post not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
 
 components:
   schemas:
+    ProblemDetails:
+      type: object
+      required: [status, title]
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        traceId:
+          type: string
     PostSummary:
       type: object
       required: [id, title, slug, language, summary, readingTimeMinutes, categoryName, categorySlug]

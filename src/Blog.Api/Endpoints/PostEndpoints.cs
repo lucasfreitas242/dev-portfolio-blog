@@ -17,7 +17,7 @@ public static class PostEndpoints
         group.MapGet("/{slug}", GetPostBySlug)
              .WithName("GetPostBySlug")
              .Produces<PostDetailDto>(StatusCodes.Status200OK)
-             .Produces(StatusCodes.Status404NotFound);
+             .ProducesProblem(StatusCodes.Status404NotFound);
 
         return group;
     }
@@ -37,6 +37,6 @@ public static class PostEndpoints
         CancellationToken ct)
     {
         var post = await handler.HandleAsync(new GetPostBySlugQuery(slug), ct);
-        return post is not null ? Results.Ok(post) : Results.NotFound();
+        return Results.Ok(post);
     }
 }

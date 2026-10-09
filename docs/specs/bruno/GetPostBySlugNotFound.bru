@@ -1,0 +1,25 @@
+meta {
+  name: Get Post By Slug (Not Found)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/posts/non-existing-slug
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status code should be 404", function() {
+    expect(res.getStatus()).to.equal(404);
+  });
+
+  test("Response should follow RFC 7807 ProblemDetails", function() {
+    const data = res.getBody();
+    expect(data.status).to.equal(404);
+    expect(data.title).to.equal("Resource Not Found");
+    expect(data.detail).to.be.a('string');
+    expect(data.instance).to.equal("/api/v1/posts/non-existing-slug");
+  });
+}

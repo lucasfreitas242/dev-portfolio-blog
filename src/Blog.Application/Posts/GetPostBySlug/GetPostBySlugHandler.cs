@@ -1,23 +1,24 @@
 namespace Blog.Application.Posts.GetPostBySlug;
 
+using Blog.Application.Exceptions;
 using Blog.Domain.Interfaces;
 
 public class GetPostBySlugHandler(IPostRepository postRepository)
 {
-    public async Task<PostDetailDto?> HandleAsync(
+    public async Task<PostDetailDto> HandleAsync(
         GetPostBySlugQuery query, 
         CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(query.Slug))
         {
-            return null;
+            throw new NotFoundException("Post slug cannot be empty.");
         }
 
         var post = await postRepository.GetBySlugAsync(query.Slug, ct);
 
         if (post is null)
         {
-            return null;
+            throw new NotFoundException("Post", query.Slug);
         }
 
         var translations = await postRepository.GetTranslationsByGroupIdAsync(post.TranslationGroupId, ct);

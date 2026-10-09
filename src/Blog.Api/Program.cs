@@ -1,6 +1,7 @@
 using Blog.Api.Data;
 using Blog.Api.Data.Repositories;
 using Blog.Api.Endpoints;
+using Blog.Api.Infrastructure;
 using Blog.Application;
 using Blog.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -18,11 +19,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddApplicationServices();
 
+// Tratamento Centralizado de Erros (RFC 7807 ProblemDetails)
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 // Swagger / OpenAPI para documentação interativa
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
