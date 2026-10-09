@@ -7,3 +7,4 @@
 | [ADR-0003](0003-variaveis-de-ambiente-e-gestao-de-segredos.md) | Gestão de Variáveis de Ambiente e Segredos | Aceite | 2026-10-09 |
 | [ADR-0004](0004-posts-multilingues-e-estrategia-slug.md) | Posts Multilíngues e Estratégia de Slugs (i18n) | Aceite | 2026-10-09 |
 | [ADR-0005](0005-tratamento-de-erros-e-problem-details.md) | Tratamento de Erros e Estratégia de ProblemDetails | Aceite | 2026-10-09 |
+| [ADR-0006](0006-adotar-bruno-para-testes-e-documentacao-de-api.md) | Adotar Bruno para Testes e Documentação de API | Aceite | 2026-10-09 |
