@@ -1,0 +1,25 @@
+meta {
+  name: List Draft Posts
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/v1/posts/drafts?page=1&pageSize=10
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status code is 200 OK", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Returns paginated draft posts", function() {
+    const data = res.getBody();
+    expect(data.items).to.be.an('array');
+    expect(data.page).to.equal(1);
+    expect(data.pageSize).to.equal(10);
+    expect(data.totalItems).to.be.a('number');
+  });
+}

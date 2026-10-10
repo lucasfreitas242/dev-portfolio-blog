@@ -1,0 +1,40 @@
+meta {
+  name: Update Post
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{baseUrl}}/api/v1/posts/00000000-0000-0000-0000-000000000000
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Updated Post Title",
+    "summary": "Updated post summary content.",
+    "contentMd": "# Updated Post\n\nNew markdown content.",
+    "categorySlug": "architecture",
+    "tags": [".NET", "Architecture", "Refactoring"]
+  }
+}
+
+tests {
+  test("Status code is 200 OK or 404 Not Found", function() {
+    expect([200, 404]).to.include(res.getStatus());
+  });
+
+  if (res.getStatus() === 200) {
+    test("Returns updated post details", function() {
+      const data = res.getBody();
+      expect(data.id).to.be.a('string');
+      expect(data.title).to.equal("Updated Post Title");
+      expect(data.updatedAt).to.be.a('string');
+    });
+  }
+}

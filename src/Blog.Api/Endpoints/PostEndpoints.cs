@@ -1,9 +1,13 @@
 namespace Blog.Api.Endpoints;
 
+using Blog.Application.Common;
 using Blog.Application.Posts.CreatePost;
+using Blog.Application.Posts.GetDraftById;
 using Blog.Application.Posts.GetPostBySlug;
+using Blog.Application.Posts.ListDraftPosts;
 using Blog.Application.Posts.ListPublishedPosts;
 using Blog.Application.Posts.PublishPost;
+using Blog.Application.Posts.UpdatePost;
 
 public static class PostEndpoints
 {
@@ -16,6 +20,15 @@ public static class PostEndpoints
              .WithName("ListPublishedPosts")
              .Produces<PagedResult<PostSummaryDto>>(StatusCodes.Status200OK);
 
+        group.MapGet("/drafts", ListDraftPosts)
+             .WithName("ListDraftPosts")
+             .Produces<PagedResult<DraftSummaryDto>>(StatusCodes.Status200OK);
+
+        group.MapGet("/drafts/{id:guid}", GetDraftById)
+             .WithName("GetDraftById")
+             .Produces<DraftDetailDto>(StatusCodes.Status200OK)
+             .ProducesProblem(StatusCodes.Status404NotFound);
+
         group.MapGet("/{slug}", GetPostBySlug)
              .WithName("GetPostBySlug")
              .Produces<PostDetailDto>(StatusCodes.Status200OK)
@@ -24,6 +37,13 @@ public static class PostEndpoints
         group.MapPost("/", CreatePost)
              .WithName("CreatePost")
              .Produces<PostCreatedDto>(StatusCodes.Status201Created)
+             .ProducesProblem(StatusCodes.Status400BadRequest)
+             .ProducesProblem(StatusCodes.Status404NotFound)
+             .ProducesProblem(StatusCodes.Status409Conflict);
+
+        group.MapPut("/{id:guid}", UpdatePost)
+             .WithName("UpdatePost")
+             .Produces<PostUpdatedDto>(StatusCodes.Status200OK)
              .ProducesProblem(StatusCodes.Status400BadRequest)
              .ProducesProblem(StatusCodes.Status404NotFound)
              .ProducesProblem(StatusCodes.Status409Conflict);
@@ -45,6 +65,24 @@ public static class PostEndpoints
         return Results.Ok(result);
     }
 
+    private static async Task<IResult> ListDraftPosts(
+        [AsParameters] ListDraftPostsQuery query,
+        ListDraftPostsHandler handler,
+        CancellationToken ct)
+    {
+        var result = await handler.HandleAsync(query, ct);
+        return Results.Ok(result);
+    }
+
+    private static async Task<IResult> GetDraftById(
+        Guid id,
+        GetDraftByIdHandler handler,
+        CancellationToken ct)
+    {
+        var result = await handler.HandleAsync(new GetDraftByIdQuery(id), ct);
+        return Results.Ok(result);
+    }
+
     private static async Task<IResult> GetPostBySlug(
         string slug,
         GetPostBySlugHandler handler,
@@ -61,6 +99,17 @@ public static class PostEndpoints
     {
         var result = await handler.HandleAsync(command, ct);
         return Results.Created($"/api/v1/posts/{result.Slug}", result);
+    }
+
+    private static async Task<IResult> UpdatePost(
+        Guid id,
+        UpdatePostCommand command,
+        UpdatePostHandler handler,
+        CancellationToken ct)
+    {
+        var updatedCommand = command with { Id = id };
+        var result = await handler.HandleAsync(updatedCommand, ct);
+        return Results.Ok(result);
     }
 
     private static async Task<IResult> PublishPost(

@@ -106,6 +106,49 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
 
+  /api/v1/posts/{id}:
+    put:
+      summary: Update an existing post
+      operationId: UpdatePost
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePostRequest'
+      responses:
+        '200':
+          description: Post updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostUpdated'
+        '400':
+          description: Validation error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Post not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Slug collision
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
   /api/v1/posts/{id}/publish:
     post:
       summary: Publish an existing draft post
@@ -126,6 +169,66 @@ paths:
                 $ref: '#/components/schemas/PostPublished'
         '404':
           description: Post not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /api/v1/posts/drafts:
+    get:
+      summary: List draft posts
+      operationId: ListDraftPosts
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: language
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paginated draft posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedDraftSummary'
+
+  /api/v1/posts/drafts/{id}:
+    get:
+      summary: Get draft post details by identifier
+      operationId: GetDraftById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Detailed draft post information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DraftDetail'
+        '404':
+          description: Draft post not found
           content:
             application/problem+json:
               schema:
@@ -465,3 +568,175 @@ components:
           type: string
         isFeatured:
           type: boolean
+
+    UpdatePostRequest:
+      type: object
+      required: [title, summary, contentMd]
+      properties:
+        title:
+          type: string
+        summary:
+          type: string
+        contentMd:
+          type: string
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+        categorySlug:
+          type: string
+          nullable: true
+        slug:
+          type: string
+          nullable: true
+        coverImage:
+          type: string
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+          nullable: true
+
+    PostUpdated:
+      type: object
+      required: [id, title, slug, language, translationGroupId, summary, contentMd, readingTimeMinutes, status, createdAt, updatedAt, categoryName, categorySlug, tags]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        slug:
+          type: string
+        language:
+          type: string
+        translationGroupId:
+          type: string
+          format: uuid
+        summary:
+          type: string
+        contentMd:
+          type: string
+        coverImage:
+          type: string
+          nullable: true
+        readingTimeMinutes:
+          type: integer
+        status:
+          type: string
+          example: "Draft"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        categoryName:
+          type: string
+        categorySlug:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    DraftSummary:
+      type: object
+      required: [id, title, slug, language, summary, readingTimeMinutes, status, createdAt, updatedAt, categoryName, categorySlug]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        slug:
+          type: string
+        language:
+          type: string
+        summary:
+          type: string
+        coverImage:
+          type: string
+          nullable: true
+        readingTimeMinutes:
+          type: integer
+        status:
+          type: string
+          example: "Draft"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        categoryName:
+          type: string
+        categorySlug:
+          type: string
+
+    PagedDraftSummary:
+      type: object
+      required: [items, page, pageSize, totalItems, totalPages]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DraftSummary'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        totalItems:
+          type: integer
+        totalPages:
+          type: integer
+
+    DraftDetail:
+      type: object
+      required: [id, title, slug, language, translationGroupId, summary, contentMd, readingTimeMinutes, status, createdAt, updatedAt, authorName, categoryName, categorySlug, tags]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        slug:
+          type: string
+        language:
+          type: string
+        translationGroupId:
+          type: string
+          format: uuid
+        summary:
+          type: string
+        contentMd:
+          type: string
+        coverImage:
+          type: string
+          nullable: true
+        readingTimeMinutes:
+          type: integer
+        status:
+          type: string
+          example: "Draft"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        authorName:
+          type: string
+        categoryName:
+          type: string
+        categorySlug:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string

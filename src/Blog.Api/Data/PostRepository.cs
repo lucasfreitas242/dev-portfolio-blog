@@ -58,6 +58,67 @@ public class PostRepository(AppDbContext db) : IPostRepository
         return await query.CountAsync(ct);
     }
 
+    public async Task<IReadOnlyList<Post>> GetDraftPostsAsync(
+        int page,
+        int pageSize,
+        string? categorySlug = null,
+        string? language = null,
+        CancellationToken ct = default)
+    {
+        var query = db.Posts
+            .AsNoTracking()
+            .Include(p => p.Category)
+            .Where(p => p.Status == PostStatus.Draft);
+
+        if (!string.IsNullOrWhiteSpace(categorySlug))
+        {
+            query = query.Where(p => p.Category.Slug == categorySlug.Trim().ToLowerInvariant());
+        }
+
+        if (!string.IsNullOrWhiteSpace(language))
+        {
+            query = query.Where(p => p.Language == language.Trim());
+        }
+
+        return await query
+            .OrderByDescending(p => p.UpdatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+    }
+
+    public async Task<int> CountDraftPostsAsync(
+        string? categorySlug = null,
+        string? language = null,
+        CancellationToken ct = default)
+    {
+        var query = db.Posts
+            .AsNoTracking()
+            .Where(p => p.Status == PostStatus.Draft);
+
+        if (!string.IsNullOrWhiteSpace(categorySlug))
+        {
+            query = query.Where(p => p.Category.Slug == categorySlug.Trim().ToLowerInvariant());
+        }
+
+        if (!string.IsNullOrWhiteSpace(language))
+        {
+            query = query.Where(p => p.Language == language.Trim());
+        }
+
+        return await query.CountAsync(ct);
+    }
+
+    public async Task<Post?> GetDraftByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        return await db.Posts
+            .AsNoTracking()
+            .Include(p => p.Author)
+            .Include(p => p.Category)
+            .Include(p => p.Tags)
+            .FirstOrDefaultAsync(p => p.Id == id && p.Status == PostStatus.Draft, ct);
+    }
+
     public async Task<Post?> GetBySlugAsync(string slug, CancellationToken ct = default)
     {
         return await db.Posts
@@ -81,6 +142,7 @@ public class PostRepository(AppDbContext db) : IPostRepository
     public async Task<Post?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
         return await db.Posts
+            .Include(p => p.Author)
             .Include(p => p.Category)
             .Include(p => p.Tags)
             .FirstOrDefaultAsync(p => p.Id == id, ct);
@@ -100,7 +162,14 @@ public class PostRepository(AppDbContext db) : IPostRepository
 
     public async Task<bool> ExistsBySlugAsync(string slug, CancellationToken ct = default)
     {
-        return await db.Posts.AnyAsync(p => p.Slug == slug.Trim().ToLowerInvariant(), ct);
+        var normalizedSlug = slug.Trim().ToLowerInvariant();
+        return await db.Posts.AnyAsync(p => p.Slug == normalizedSlug, ct);
+    }
+
+    public async Task<bool> ExistsBySlugAsync(string slug, Guid excludePostId, CancellationToken ct = default)
+    {
+        var normalizedSlug = slug.Trim().ToLowerInvariant();
+        return await db.Posts.AnyAsync(p => p.Slug == normalizedSlug && p.Id != excludePostId, ct);
     }
 
     public async Task<bool> ExistsByTranslationGroupAndLanguageAsync(

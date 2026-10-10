@@ -10,3 +10,5 @@
 | [ADR-0006](0006-adotar-bruno-para-testes-e-documentacao-de-api.md) | Adotar Bruno para Testes e Documentação de API | Aceite | 2026-10-09 |
 | [ADR-0007](0007-fluxo-de-criacao-de-posts-e-autoria-de-traducoes.md) | Fluxo de Criação de Posts e Autoria de Traduções | Aceite | 2026-10-09 |
 | [ADR-0008](0008-gerenciamento-de-categorias-e-fluxo-de-autoria.md) | Gerenciamento de Categorias e Fluxo de Autoria | Aceite | 2026-10-10 |
+| [ADR-0009](0009-atualizacao-de-posts-e-mutacao-de-slug.md) | Atualização de Posts e Mutação de Slugs | Aceite | 2026-10-10 |
+| [ADR-0010](0010-gestao-de-rascunhos-e-feed-de-autoria.md) | Gestão de Rascunhos e Feed de Autoria | Aceite | 2026-10-10 |

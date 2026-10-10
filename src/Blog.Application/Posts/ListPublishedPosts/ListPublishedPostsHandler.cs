@@ -1,5 +1,6 @@
 namespace Blog.Application.Posts.ListPublishedPosts;
 
+using Blog.Application.Common;
 using Blog.Domain.Interfaces;
 
 public class ListPublishedPostsHandler(IPostRepository postRepository)

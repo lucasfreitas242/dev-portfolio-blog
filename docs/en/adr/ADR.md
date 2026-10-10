@@ -10,3 +10,5 @@
 | [ADR-0006](0006-adopt-bruno-for-api-testing-and-documentation.md) | Adopt Bruno for API Testing and Documentation | Accepted | 2026-10-09 |
 | [ADR-0007](0007-post-creation-and-translation-authoring-flow.md) | Post Creation and Translation Authoring Flow | Accepted | 2026-10-09 |
 | [ADR-0008](0008-category-management-and-authoring-flow.md) | Category Management and Authoring Flow | Accepted | 2026-10-10 |
+| [ADR-0009](0009-post-update-and-slug-mutation-strategy.md) | Post Update and Slug Mutation Strategy | Accepted | 2026-10-10 |
+| [ADR-0010](0010-draft-posts-management-and-authoring-feed.md) | Draft Posts Management and Authoring Feed | Accepted | 2026-10-10 |

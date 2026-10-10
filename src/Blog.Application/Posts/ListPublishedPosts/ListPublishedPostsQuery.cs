@@ -1,5 +1,7 @@
 namespace Blog.Application.Posts.ListPublishedPosts;
 
+using Blog.Application.Common;
+
 public record ListPublishedPostsQuery(
     int Page = 1,
     int PageSize = 10,
@@ -17,10 +19,3 @@ public record PostSummaryDto(
     DateTime? PublishedAt,
     string CategoryName,
     string CategorySlug);
-
-public record PagedResult<T>(
-    IReadOnlyList<T> Items,
-    int Page,
-    int PageSize,
-    int TotalItems,
-    int TotalPages);

@@ -16,6 +16,22 @@ public interface IPostRepository
         string? language = null,
         CancellationToken ct = default);
 
+    Task<IReadOnlyList<Post>> GetDraftPostsAsync(
+        int page, 
+        int pageSize, 
+        string? categorySlug = null, 
+        string? language = null,
+        CancellationToken ct = default);
+
+    Task<int> CountDraftPostsAsync(
+        string? categorySlug = null, 
+        string? language = null,
+        CancellationToken ct = default);
+
+    Task<Post?> GetDraftByIdAsync(
+        Guid id, 
+        CancellationToken ct = default);
+
     Task<Post?> GetBySlugAsync(
         string slug, 
         CancellationToken ct = default);
@@ -38,6 +54,11 @@ public interface IPostRepository
 
     Task<bool> ExistsBySlugAsync(
         string slug, 
+        CancellationToken ct = default);
+
+    Task<bool> ExistsBySlugAsync(
+        string slug, 
+        Guid excludePostId,
         CancellationToken ct = default);
 
     Task<bool> ExistsByTranslationGroupAndLanguageAsync(

@@ -61,6 +61,27 @@ public class Post
         UpdatedAt = DateTime.UtcNow;
     }
 
+    public void Update(
+        string title,
+        string summary,
+        string contentMd,
+        Guid categoryId,
+        string? slug = null,
+        string? coverImage = null)
+    {
+        Title = title;
+        Summary = summary;
+        ContentMd = contentMd;
+        CategoryId = categoryId;
+        if (!string.IsNullOrWhiteSpace(slug))
+        {
+            Slug = slug;
+        }
+        CoverImage = coverImage;
+        ReadingTimeMinutes = CalculateReadingTime(contentMd);
+        UpdatedAt = DateTime.UtcNow;
+    }
+
     private static int CalculateReadingTime(string content)
     {
         var wordCount = content.Split([' ', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries).Length;
