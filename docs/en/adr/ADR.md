@@ -13,3 +13,4 @@
 | [ADR-0009](0009-post-update-and-slug-mutation-strategy.md) | Post Update and Slug Mutation Strategy | Accepted | 2026-10-10 |
 | [ADR-0010](0010-draft-posts-management-and-authoring-feed.md) | Draft Posts Management and Authoring Feed | Accepted | 2026-10-10 |
 | [ADR-0011](0011-single-admin-jwt-authentication.md) | Single-Admin JWT Authentication Strategy | Accepted | 2026-10-10 |
+| [ADR-0012](0012-post-deletion-and-soft-delete-strategy.md) | Post Deletion and Soft Delete Strategy | Accepted | 2026-10-10 |

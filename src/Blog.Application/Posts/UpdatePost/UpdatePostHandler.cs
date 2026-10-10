@@ -28,7 +28,7 @@ public class UpdatePostHandler(
         }
 
         var post = await postRepository.GetByIdAsync(command.Id, ct);
-        if (post is null)
+        if (post is null || post.Status == Blog.Domain.Enums.PostStatus.Archived)
         {
             throw new NotFoundException("Post", command.Id);
         }

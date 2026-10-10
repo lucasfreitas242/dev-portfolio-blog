@@ -82,6 +82,12 @@ public class Post
         UpdatedAt = DateTime.UtcNow;
     }
 
+    public void Archive()
+    {
+        Status = PostStatus.Archived;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
     private static int CalculateReadingTime(string content)
     {
         var wordCount = content.Split([' ', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries).Length;

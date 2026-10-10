@@ -2,6 +2,7 @@ namespace Blog.Api.Endpoints;
 
 using Blog.Application.Common;
 using Blog.Application.Posts.CreatePost;
+using Blog.Application.Posts.DeletePost;
 using Blog.Application.Posts.GetDraftById;
 using Blog.Application.Posts.GetPostBySlug;
 using Blog.Application.Posts.ListDraftPosts;
@@ -60,6 +61,13 @@ public static class PostEndpoints
              .WithName("PublishPost")
              .RequireAuthorization()
              .Produces<PostPublishedDto>(StatusCodes.Status200OK)
+             .ProducesProblem(StatusCodes.Status401Unauthorized)
+             .ProducesProblem(StatusCodes.Status404NotFound);
+
+        group.MapDelete("/{id:guid}", DeletePost)
+             .WithName("DeletePost")
+             .RequireAuthorization()
+             .Produces(StatusCodes.Status204NoContent)
              .ProducesProblem(StatusCodes.Status401Unauthorized)
              .ProducesProblem(StatusCodes.Status404NotFound);
 
@@ -129,5 +137,14 @@ public static class PostEndpoints
     {
         var result = await handler.HandleAsync(new PublishPostCommand(id), ct);
         return Results.Ok(result);
+    }
+
+    private static async Task<IResult> DeletePost(
+        Guid id,
+        DeletePostHandler handler,
+        CancellationToken ct)
+    {
+        await handler.HandleAsync(new DeletePostCommand(id), ct);
+        return Results.NoContent();
     }
 }
