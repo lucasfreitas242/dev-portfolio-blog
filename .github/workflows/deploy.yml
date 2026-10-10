@@ -1,0 +1,152 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ============================================================================
+  # Stage 1: Build, Test & Compile Migration Bundle
+  # Runs on both PRs and pushes to main
+  # ============================================================================
+  build-and-test:
+    name: Build, Test & Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install dotnet-ef CLI Tool
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Restore Package Dependencies
+        run: dotnet restore src/Blog.Api/Blog.Api.csproj
+
+      - name: Build Solution in Release Mode
+        run: dotnet build --no-restore -c Release
+
+      - name: Execute Automated Unit Tests
+        run: dotnet test --no-build -c Release --verbosity normal
+
+      - name: Generate EF Core Migration Bundle Binary
+        run: |
+          dotnet ef migrations bundle \
+            --project src/Blog.Api \
+            --startup-project src/Blog.Api \
+            --output ./efbundle \
+            --self-contained \
+            -r linux-x64 \
+            --verbose
+
+      - name: Upload Migration Bundle Artifact
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: efbundle
+          path: ./efbundle
+          if-no-files-found: error
+          retention-days: 1
+
+  # ============================================================================
+  # Stage 2: Database Migration (CD)
+  # Executes EF Core migration bundle against production DB prior to deployment
+  # ============================================================================
+  apply-migrations:
+    name: Apply Database Migrations
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Migration Bundle Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: efbundle
+
+      - name: Execute Migration Bundle Against Target Database
+        env:
+          PROD_CONNECTION_STRING: ${{ secrets.PROD_DATABASE_CONNECTION_STRING }}
+        run: |
+          chmod +x ./efbundle
+          ./efbundle --connection "$PROD_CONNECTION_STRING"
+
+  # ============================================================================
+  # Stage 3: Container Build & Push to GHCR (CD)
+  # Builds multi-stage Dockerfile and pushes tagged image to GHCR
+  # ============================================================================
+  publish-container:
+    name: Build & Push Container to GHCR
+    needs: apply-migrations
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: actions/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker Metadata (Tags & Labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,format=long
+            type=raw,value=latest
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============================================================================
+  # Stage 4: Trigger Render Cloud Deployment (CD)
+  # Triggers zero-downtime container pull on Render via Webhook Deploy Hook
+  # ============================================================================
+  deploy-to-render:
+    name: Trigger Render Deployment
+    needs: publish-container
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call Render Deploy Hook
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_HOOK_URL" ]; then
+            echo "ERROR: RENDER_DEPLOY_HOOK_URL secret is not set!"
+            exit 1
+          fi
+          echo "Triggering deployment hook on Render..."
+          curl -s -S -X POST "$DEPLOY_HOOK_URL"
+          echo "Deployment triggered successfully."
