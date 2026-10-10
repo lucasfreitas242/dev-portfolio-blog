@@ -12,3 +12,4 @@
 | [ADR-0008](0008-gerenciamento-de-categorias-e-fluxo-de-autoria.md) | Gerenciamento de Categorias e Fluxo de Autoria | Aceite | 2026-10-10 |
 | [ADR-0009](0009-atualizacao-de-posts-e-mutacao-de-slug.md) | Atualização de Posts e Mutação de Slugs | Aceite | 2026-10-10 |
 | [ADR-0010](0010-gestao-de-rascunhos-e-feed-de-autoria.md) | Gestão de Rascunhos e Feed de Autoria | Aceite | 2026-10-10 |
+| [ADR-0011](0011-autenticacao-jwt-administrador-unico.md) | Estratégia de Autenticação JWT para Administrador Único | Aceite | 2026-10-10 |

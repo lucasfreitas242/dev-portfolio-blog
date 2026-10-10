@@ -22,11 +22,15 @@ public static class PostEndpoints
 
         group.MapGet("/drafts", ListDraftPosts)
              .WithName("ListDraftPosts")
-             .Produces<PagedResult<DraftSummaryDto>>(StatusCodes.Status200OK);
+             .RequireAuthorization()
+             .Produces<PagedResult<DraftSummaryDto>>(StatusCodes.Status200OK)
+             .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         group.MapGet("/drafts/{id:guid}", GetDraftById)
              .WithName("GetDraftById")
+             .RequireAuthorization()
              .Produces<DraftDetailDto>(StatusCodes.Status200OK)
+             .ProducesProblem(StatusCodes.Status401Unauthorized)
              .ProducesProblem(StatusCodes.Status404NotFound);
 
         group.MapGet("/{slug}", GetPostBySlug)
@@ -36,21 +40,27 @@ public static class PostEndpoints
 
         group.MapPost("/", CreatePost)
              .WithName("CreatePost")
+             .RequireAuthorization()
              .Produces<PostCreatedDto>(StatusCodes.Status201Created)
              .ProducesProblem(StatusCodes.Status400BadRequest)
+             .ProducesProblem(StatusCodes.Status401Unauthorized)
              .ProducesProblem(StatusCodes.Status404NotFound)
              .ProducesProblem(StatusCodes.Status409Conflict);
 
         group.MapPut("/{id:guid}", UpdatePost)
              .WithName("UpdatePost")
+             .RequireAuthorization()
              .Produces<PostUpdatedDto>(StatusCodes.Status200OK)
              .ProducesProblem(StatusCodes.Status400BadRequest)
+             .ProducesProblem(StatusCodes.Status401Unauthorized)
              .ProducesProblem(StatusCodes.Status404NotFound)
              .ProducesProblem(StatusCodes.Status409Conflict);
 
         group.MapPost("/{id:guid}/publish", PublishPost)
              .WithName("PublishPost")
+             .RequireAuthorization()
              .Produces<PostPublishedDto>(StatusCodes.Status200OK)
+             .ProducesProblem(StatusCodes.Status401Unauthorized)
              .ProducesProblem(StatusCodes.Status404NotFound);
 
         return group;

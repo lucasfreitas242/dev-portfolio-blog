@@ -22,8 +22,10 @@ public static class CategoryEndpoints
 
         group.MapPost("/", CreateCategory)
              .WithName("CreateCategory")
+             .RequireAuthorization()
              .Produces<CategoryCreatedDto>(StatusCodes.Status201Created)
              .ProducesProblem(StatusCodes.Status400BadRequest)
+             .ProducesProblem(StatusCodes.Status401Unauthorized)
              .ProducesProblem(StatusCodes.Status409Conflict);
 
         return group;

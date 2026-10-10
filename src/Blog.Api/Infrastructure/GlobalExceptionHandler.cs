@@ -17,6 +17,12 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
 
         var (statusCode, title, detail, type) = exception switch
         {
+            UnauthorizedException unauthorized => (
+                StatusCodes.Status401Unauthorized,
+                "Unauthorized",
+                unauthorized.Message,
+                "https://tools.ietf.org/html/rfc9110#section-15.5.2"
+            ),
             NotFoundException notFound => (
                 StatusCodes.Status404NotFound,
                 "Resource Not Found",

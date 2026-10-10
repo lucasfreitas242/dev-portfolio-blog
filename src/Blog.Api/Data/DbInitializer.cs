@@ -3,9 +3,11 @@ namespace Blog.Api.Data;
 using Blog.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
+using Blog.Domain.Interfaces;
+
 public static class DbInitializer
 {
-    public static async Task SeedAsync(AppDbContext context)
+    public static async Task SeedAsync(AppDbContext context, IPasswordHasher passwordHasher)
     {
         await context.Database.MigrateAsync();
 
@@ -19,6 +21,13 @@ public static class DbInitializer
             WHERE ""TranslationGroupId"" = '00000000-0000-0000-0000-000000000000';
         ");
 
+        var existingUser = await context.Users.FirstOrDefaultAsync(u => u.Email == "contato@lucasefreitas.dev");
+        if (existingUser != null && !passwordHasher.VerifyPassword("Admin@123!", existingUser.PasswordHash))
+        {
+            existingUser.UpdatePassword(passwordHasher.HashPassword("Admin@123!"));
+            await context.SaveChangesAsync();
+        }
+
         if (await context.Posts.AnyAsync())
         {
             return;
@@ -26,7 +35,7 @@ public static class DbInitializer
 
         var author = new User(
             email: "contato@lucasefreitas.dev",
-            passwordHash: "AQAAAAIAAYagAAAAEPw...", // Hash provisório para desenvolvimento
+            passwordHash: passwordHasher.HashPassword("Admin@123!"),
             name: "Lucas Freitas"
         );
 
