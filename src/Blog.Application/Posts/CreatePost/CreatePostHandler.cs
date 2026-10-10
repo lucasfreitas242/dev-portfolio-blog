@@ -5,7 +5,9 @@ using Blog.Domain.Common;
 using Blog.Domain.Entities;
 using Blog.Domain.Interfaces;
 
-public class CreatePostHandler(IPostRepository postRepository)
+public class CreatePostHandler(
+    IPostRepository postRepository,
+    ICategoryRepository categoryRepository)
 {
     public async Task<PostCreatedDto> HandleAsync(
         CreatePostCommand command, 
@@ -40,9 +42,27 @@ public class CreatePostHandler(IPostRepository postRepository)
             throw new ConflictException($"A post with slug '{slug}' already exists.");
         }
 
-        if (!await postRepository.CategoryExistsAsync(command.CategoryId, ct))
+        Category? category;
+        if (command.CategoryId.HasValue && command.CategoryId.Value != Guid.Empty)
         {
-            throw new NotFoundException("Category", command.CategoryId);
+            category = await categoryRepository.GetByIdAsync(command.CategoryId.Value, ct);
+            if (category is null)
+            {
+                throw new NotFoundException("Category", command.CategoryId.Value);
+            }
+        }
+        else if (!string.IsNullOrWhiteSpace(command.CategorySlug))
+        {
+            var normalizedCategorySlug = SlugHelper.Generate(command.CategorySlug);
+            category = await categoryRepository.GetBySlugAsync(normalizedCategorySlug, ct);
+            if (category is null)
+            {
+                throw new NotFoundException("Category", command.CategorySlug);
+            }
+        }
+        else
+        {
+            throw new ValidationException("Category", "Either CategoryId or CategorySlug must be provided.");
         }
 
         var language = string.IsNullOrWhiteSpace(command.Language) 
@@ -81,7 +101,7 @@ public class CreatePostHandler(IPostRepository postRepository)
             slug: slug,
             summary: command.Summary.Trim(),
             contentMd: command.ContentMd,
-            categoryId: command.CategoryId,
+            categoryId: category.Id,
             authorId: authorId,
             language: language,
             translationGroupId: translationGroupId,

@@ -1,0 +1,28 @@
+meta {
+  name: List Categories
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/categories
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status code is 200 OK", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Returns list of categories", function() {
+    const data = res.getBody();
+    expect(data).to.be.an('array');
+    if (data.length > 0) {
+      expect(data[0].id).to.be.a('string');
+      expect(data[0].name).to.be.a('string');
+      expect(data[0].slug).to.be.a('string');
+      expect(data[0].postCount).to.be.a('number');
+    }
+  });
+}

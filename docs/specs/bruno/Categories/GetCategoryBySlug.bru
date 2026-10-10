@@ -1,0 +1,25 @@
+meta {
+  name: Get Category By Slug
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/categories/architecture
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status code is 200 OK or 404 Not Found", function() {
+    expect([200, 404]).to.include(res.getStatus());
+  });
+
+  if (res.getStatus() === 200) {
+    test("Category details include slug and postCount", function() {
+      const data = res.getBody();
+      expect(data.slug).to.equal("architecture");
+      expect(data.postCount).to.be.a('number');
+    });
+  }
+}

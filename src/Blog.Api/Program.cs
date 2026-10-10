@@ -17,6 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Injeção de Dependências
 builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddApplicationServices();
 
 // Tratamento Centralizado de Erros (RFC 7807 ProblemDetails)
@@ -42,6 +43,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapPostEndpoints();
+app.MapCategoryEndpoints();
 
 app.UseHttpsRedirection();
 

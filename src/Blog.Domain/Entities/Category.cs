@@ -17,4 +17,9 @@ public class Category
         Slug = slug;
         IsFeatured = isFeatured;
     }
+
+    public static Category Create(string name, string slug, bool isFeatured = false)
+    {
+        return new Category(name, slug, isFeatured);
+    }
 }
