@@ -81,6 +81,9 @@ jobs:
         env:
           PROD_CONNECTION_STRING: ${{ secrets.PROD_DATABASE_CONNECTION_STRING }}
           ConnectionStrings__DefaultConnection: ${{ secrets.PROD_DATABASE_CONNECTION_STRING }}
+          JwtSettings__SecretKey: "temporary-migration-key-must-be-at-least-32-chars-long!"
+          JwtSettings__Issuer: "BlogApi"
+          JwtSettings__Audience: "BlogFrontend"
         run: |
           if [ -z "$PROD_CONNECTION_STRING" ]; then
             echo "ERRO: O secret PROD_DATABASE_CONNECTION_STRING não foi configurado ou está vazio!"
