@@ -61,7 +61,7 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  # ============================================================================
+ # ============================================================================
   # Stage 2: Database Migration (CD)
   # Executes EF Core migration bundle against production DB prior to deployment
   # ============================================================================
@@ -80,10 +80,14 @@ jobs:
       - name: Execute Migration Bundle Against Target Database
         env:
           PROD_CONNECTION_STRING: ${{ secrets.PROD_DATABASE_CONNECTION_STRING }}
+          ConnectionStrings__DefaultConnection: ${{ secrets.PROD_DATABASE_CONNECTION_STRING }}
         run: |
+          if [ -z "$PROD_CONNECTION_STRING" ]; then
+            echo "ERRO: O secret PROD_DATABASE_CONNECTION_STRING não foi configurado ou está vazio!"
+            exit 1
+          fi
           chmod +x ./efbundle
-          ./efbundle --connection "$PROD_CONNECTION_STRING"
-
+          ./efbundle --connection "$PROD_CONNECTION_STRING" --verbose
   # ============================================================================
   # Stage 3: Container Build & Push to GHCR (CD)
   # Builds multi-stage Dockerfile and pushes tagged image to GHCR
