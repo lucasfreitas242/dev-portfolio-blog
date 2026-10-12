@@ -32,10 +32,12 @@ jobs:
         run: dotnet tool install --global dotnet-ef
 
       - name: Restore Package Dependencies
-        run: dotnet restore src/Blog.Api/Blog.Api.csproj
-
+        run: |
+          dotnet restore src/Blog.Api/Blog.Api.csproj
+          dotnet restore tests/Blog.Domain.Tests/Blog.Domain.Tests.csproj
+          
       - name: Build Solution in Release Mode
-        run: dotnet build --no-restore -c Release
+        run: dotnet build -c Release
 
       - name: Execute Automated Unit Tests
         run: dotnet test --no-build -c Release --verbosity normal
