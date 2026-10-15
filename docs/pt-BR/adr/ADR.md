@@ -14,3 +14,4 @@
 | [ADR-0010](0010-gestao-de-rascunhos-e-feed-de-autoria.md) | Gestão de Rascunhos e Feed de Autoria | Aceite | 2026-10-10 |
 | [ADR-0011](0011-autenticacao-jwt-administrador-unico.md) | Estratégia de Autenticação JWT para Administrador Único | Aceite | 2026-10-10 |
 | [ADR-0012](0012-eliminacao-de-posts-e-estrategia-de-soft-delete.md) | Eliminação de Posts e Estratégia de Soft Delete | Aceite | 2026-10-10 |
+| [ADR-0013](0013-politica-cors-para-consumo-do-frontend.md) | Política de CORS para Consumo do Frontend | Aceite | 2026-10-15 |
